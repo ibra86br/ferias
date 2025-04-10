@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Día a Día</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Quicksand', sans-serif;
+      background: url('A_graffiti-style_digital_artwork_showcases_the_nam.png') no-repeat center center fixed;
+      background-size: cover;
+      position: relative;
+    }
+
+    /* Camada branca semi-transparente */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: white;
+      opacity: 0.2; /* Deixa a imagem com cerca de 80% de visibilidade */
+      z-index: -1;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.85);
+      margin: 5% auto;
+      padding: 40px;
+      width: 70%;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(255, 192, 203, 0.8);
+      text-align: center;
+      color: #8B0000;
+    }
+
+    h1 {
+      font-size: 48px;
+      margin-bottom: 30px;
+      font-weight: 600;
+    }
+
+    .dia {
+      font-size: 22px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .fecha {
+      font-weight: bold;
+      color: #D6336C;
+    }
+
+    .mensaje {
+      margin-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Día a Día</h1>
+
+    <div class="dia">
+      <span class="fecha">Día 1:</span>
+      <span class="mensaje">Hoy recordé tu sonrisa y me hizo feliz todo el día.</span>
+    </div>
+
+    <div class="dia">
+      <span class="fecha">Día 2:</span>
+      <span class="mensaje">Un mensaje tuyo cambió por completo mi estado de ánimo.</span>
+    </div>
+
+    <div class="dia">
+      <span class="fecha">Día 3:</span>
+      <span class="mensaje">Pensarte se ha vuelto mi parte favorita del día.</span>
+    </div>
+
+  </div>
+</body>
+</html>
