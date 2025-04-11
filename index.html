@@ -6,83 +6,6 @@
   <title>Mais um dia sem você</title>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://kit.fontawesome.com/a2d0b5d6d3.js" crossorigin="anonymous"></script>
-  <script type="module">
-    // Importa Firebase
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
-
-    // Configuración de Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyCTSH4oEu56rEGYapk9BW6PcrXjZ5UZm08",
-      authDomain: "chatlive-2f934.firebaseapp.com",
-      databaseURL: "https://chatlive-2f934-default-rtdb.firebaseio.com",
-      projectId: "chatlive-2f934",
-      storageBucket: "chatlive-2f934.appspot.com",
-      messagingSenderId: "929554773163",
-      appId: "1:929554773163:web:499f1a8ce3c201621073ee"
-    };
-
-    // Inicializa Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    let usuario = localStorage.getItem("usuario");
-
-    function iniciarChat() {
-      const chatMensajes = document.getElementById("chatMensajes");
-      const chatInput = document.getElementById("chatInput");
-
-      const mensajesRef = collection(db, "chat");
-
-      // Escucha en tiempo real
-      const q = query(mensajesRef, orderBy("timestamp"));
-      onSnapshot(q, (snapshot) => {
-        chatMensajes.innerHTML = "";
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          const emoji = data.usuario === "Você" ? "💙" : "💖";
-          const mensajeElem = document.createElement("div");
-          mensajeElem.innerHTML = `<strong>${emoji} ${data.usuario}:</strong> ${data.mensaje}`;
-          chatMensajes.appendChild(mensajeElem);
-          chatMensajes.scrollTop = chatMensajes.scrollHeight;
-        });
-      });
-
-      document.getElementById("enviarBtn").onclick = async () => {
-        const texto = chatInput.value.trim();
-        if (texto !== "") {
-          await addDoc(mensajesRef, {
-            usuario: usuario,
-            mensaje: texto,
-            timestamp: new Date()
-          });
-          chatInput.value = "";
-        }
-      };
-    }
-
-    window.verificarSenha = function () {
-      const senha = document.getElementById("senha").value;
-      const loginBox = document.getElementById("loginBox");
-      const conteudo = document.getElementById("conteudo");
-      const erroMsg = document.getElementById("erroMsg");
-
-      if (senha === "14141516") {
-        usuario = "Você";
-      } else if (senha === "170125") {
-        usuario = "Kamille";
-      } else {
-        erroMsg.style.display = "block";
-        return;
-      }
-
-      localStorage.setItem("usuario", usuario);
-      loginBox.style.display = "none";
-      conteudo.style.display = "block";
-      document.body.classList.add("fundoAtivo");
-      iniciarChat();
-    };
-  </script>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -131,7 +54,35 @@
     }
     .fecha { font-weight: bold; color: #D6336C; }
     .mensaje { margin-left: 10px; }
-
+    .chat {
+      text-align: left;
+      margin-top: 20px;
+      border-top: 1px solid #ccc;
+      padding-top: 20px;
+    }
+    .chat-mensajes {
+      height: 200px;
+      overflow-y: auto;
+      background: #fff;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+    }
+    .chat input {
+      width: 80%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .chat button {
+      padding: 10px;
+      background-color: #D6336C;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
     .login-box {
       background-image: url('background_login.png');
       background-size: cover;
@@ -164,6 +115,131 @@
     }
     .login-overlay input[type="password"] {
       padding: 10px;
-      width
-::contentReference[oaicite:0]{index=0}
- 
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+    .login-overlay button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #D6336C;
+      color: white;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .login-overlay button:hover {
+      background-color: #c12259;
+    }
+    .error {
+      color: red;
+      font-size: 14px;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box" id="loginBox">
+    <div class="login-overlay">
+      <i class="fas fa-lock"></i>
+      <h2>Confirmemos quem é você</h2>
+      <input type="password" id="senha" placeholder="Senha" onkeypress="if(event.key === 'Enter') verificarSenha()">
+      <button onclick="verificarSenha()">Entrar</button>
+      <p class="error" id="erroMsg" style="display:none;">Senha incorreta!</p>
+    </div>
+  </div>
+
+  <div class="container" id="conteudo">
+    <h1>Mais um dia sem você</h1>
+    <div class="dia">
+      <span class="fecha">Día 1:</span>
+      <span class="mensaje">Começei fazer o site para suas ferias kkkkkkkkk.</span>
+    </div>
+    <div class="chat">
+      <div class="chat-mensajes" id="chatMensajes"></div>
+      <input type="text" id="chatInput" placeholder="Escreva uma mensagem...">
+      <button id="enviarBtn">Enviar</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCTSH4oEu56rEGYapk9BW6PcrXjZ5UZm08",
+      authDomain: "chatlive-2f934.firebaseapp.com",
+      databaseURL: "https://chatlive-2f934-default-rtdb.firebaseio.com",
+      projectId: "chatlive-2f934",
+      storageBucket: "chatlive-2f934.appspot.com",
+      messagingSenderId: "929554773163",
+      appId: "1:929554773163:web:499f1a8ce3c201621073ee"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let usuario = localStorage.getItem("usuario");
+
+    function iniciarChat() {
+      const chatMensajes = document.getElementById("chatMensajes");
+      const chatInput = document.getElementById("chatInput");
+
+      const mensajesRef = collection(db, "chat");
+      const q = query(mensajesRef, orderBy("timestamp"));
+
+      onSnapshot(q, (snapshot) => {
+        chatMensajes.innerHTML = "";
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          const emoji = data.usuario === "Você" ? "💙" : "💖";
+          const mensajeElem = document.createElement("div");
+          mensajeElem.innerHTML = `<strong>${emoji} ${data.usuario}:</strong> ${data.mensaje}`;
+          chatMensajes.appendChild(mensajeElem);
+        });
+        chatMensajes.scrollTop = chatMensajes.scrollHeight;
+      });
+
+      document.getElementById("enviarBtn").onclick = async () => {
+        const texto = chatInput.value.trim();
+        if (texto !== "") {
+          await addDoc(mensajesRef, {
+            usuario: usuario,
+            mensaje: texto,
+            timestamp: new Date()
+          });
+          chatInput.value = "";
+        }
+      };
+    }
+
+    window.verificarSenha = function () {
+      const senha = document.getElementById("senha").value;
+      const loginBox = document.getElementById("loginBox");
+      const conteudo = document.getElementById("conteudo");
+      const erroMsg = document.getElementById("erroMsg");
+
+      if (senha === "14141516") {
+        usuario = "Você";
+      } else if (senha === "170125") {
+        usuario = "Kamille";
+      } else {
+        erroMsg.style.display = "block";
+        return;
+      }
+
+      localStorage.setItem("usuario", usuario);
+      loginBox.style.display = "none";
+      conteudo.style.display = "block";
+      document.body.classList.add("fundoAtivo");
+      iniciarChat();
+    };
+  </script>
+</body>
+</html>
