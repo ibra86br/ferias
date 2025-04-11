@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mais um dia sem você</title>
+  <title>Blaze</title>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://kit.fontawesome.com/a2d0b5d6d3.js" crossorigin="anonymous"></script>
   <style>
@@ -157,10 +157,7 @@
 
   <div class="container" id="conteudo">
     <h1>Mais um dia sem você</h1>
-    <div class="dia">
-      <span class="fecha">Día 1:</span>
-      <span class="mensaje">Começei fazer o site para suas ferias kkkkkkkkk.</span>
-    </div>
+    
     <div class="chat">
       <div class="chat-mensajes" id="chatMensajes"></div>
       <input type="text" id="chatInput" placeholder="Escreva uma mensagem...">
@@ -226,9 +223,12 @@
       const erroMsg = document.getElementById("erroMsg");
 
       if (senha === "14141516") {
-        usuario = "Você";
+        usuario = "Ele";
       } else if (senha === "170125") {
-        usuario = "Kamille";
+        usuario = "Ela";
+      } else if (senha === "4444") {
+        window.location.href = "https://blaze.com"; // 🚨 Saída de emergência
+        return;
       } else {
         erroMsg.style.display = "block";
         return;
