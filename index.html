@@ -195,7 +195,7 @@
         chatMensajes.innerHTML = "";
         snapshot.forEach((doc) => {
           const data = doc.data();
-          const emoji = data.usuario === "Você" ? "💙" : "💖";
+          const emoji = data.usuario === "Ele" ? "💙" : "💖";
           const mensajeElem = document.createElement("div");
           mensajeElem.innerHTML = `<strong>${emoji} ${data.usuario}:</strong> ${data.mensaje}`;
           chatMensajes.appendChild(mensajeElem);
