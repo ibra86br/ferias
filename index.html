@@ -204,7 +204,6 @@
           const data = doc.data();
           const emoji = data.usuario === "Ele" ? "💙" : "💖";
           const hora = data.timestamp ? formatarData(data.timestamp) : "🕒";
-          const lido = "✅";
 
           const mensajeElem = document.createElement("div");
           mensajeElem.innerHTML = `<strong>${emoji} ${data.usuario}:</strong> ${data.mensaje} <span class="hora">${hora} ${lido}</span>`;
