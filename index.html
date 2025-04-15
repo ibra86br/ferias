@@ -47,13 +47,6 @@
       margin-bottom: 25px;
       font-weight: 600;
     }
-    .dia {
-      font-size: 18px;
-      margin-bottom: 18px;
-      text-align: left;
-    }
-    .fecha { font-weight: bold; color: #D6336C; }
-    .mensaje { margin-left: 10px; }
     .chat {
       text-align: left;
       margin-top: 20px;
@@ -69,11 +62,12 @@
       margin-bottom: 10px;
       border: 1px solid #ddd;
     }
-    .chat input {
-      width: 80%;
+    .chat input[type="text"] {
+      width: 60%;
       padding: 10px;
       border-radius: 5px;
       border: 1px solid #ccc;
+      margin-right: 5px;
     }
     .chat button {
       padding: 10px;
@@ -82,6 +76,7 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      margin-right: 5px;
     }
     .login-box {
       background-image: url('background_login.png');
@@ -166,12 +161,15 @@
       <div class="chat-mensajes" id="chatMensajes"></div>
       <input type="text" id="chatInput" placeholder="Escreva uma mensagem...">
       <button id="enviarBtn">Enviar</button>
+      <input type="file" accept="image/*" capture="environment" id="fotoInput" style="display:none;">
+      <button id="fotoBtn">📷 Foto</button>
     </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
     import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCTSH4oEu56rEGYapk9BW6PcrXjZ5UZm08",
@@ -185,6 +183,7 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const storage = getStorage(app);
     let usuario = localStorage.getItem("usuario");
 
     function formatarData(data) {
@@ -223,6 +222,26 @@
           chatInput.value = "";
         }
       };
+
+      document.getElementById("fotoBtn").onclick = () => {
+        document.getElementById("fotoInput").click();
+      };
+
+      document.getElementById("fotoInput").addEventListener("change", async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const fileRef = ref(storage, `fotos/${Date.now()}_${file.name}`);
+        await uploadBytes(fileRef, file);
+
+        const url = await getDownloadURL(fileRef);
+
+        await addDoc(mensajesRef, {
+          usuario: usuario,
+          mensaje: `<img src="${url}" style="max-width: 200px; border-radius: 10px;" />`,
+          timestamp: serverTimestamp()
+        });
+      });
     }
 
     window.verificarSenha = function () {
