@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Como não falar com minha menininha 20 dias? 😅</title>
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mais um dia sem você</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet" />
   <script src="https://kit.fontawesome.com/a2d0b5d6d3.js" crossorigin="anonymous"></script>
   <style>
     * { box-sizing: border-box; }
@@ -142,6 +142,11 @@
       from { opacity: 0; }
       to { opacity: 1; }
     }
+    .hora {
+      font-size: 12px;
+      color: gray;
+      margin-left: 8px;
+    }
   </style>
 </head>
 <body>
@@ -157,10 +162,6 @@
 
   <div class="container" id="conteudo">
     <h1>Mais um dia sem você</h1>
-    <div class="dia">
-      <span class="fecha">Día 1:</span>
-      <span class="mensaje">Começei fazer o site para suas ferias kkkkkkkkk.</span>
-    </div>
     <div class="chat">
       <div class="chat-mensajes" id="chatMensajes"></div>
       <input type="text" id="chatInput" placeholder="Escreva uma mensagem...">
@@ -170,7 +171,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCTSH4oEu56rEGYapk9BW6PcrXjZ5UZm08",
@@ -184,13 +185,16 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
     let usuario = localStorage.getItem("usuario");
+
+    function formatarData(data) {
+      const d = data.toDate();
+      return d.toLocaleDateString() + ' ' + d.toLocaleTimeString().slice(0, 5);
+    }
 
     function iniciarChat() {
       const chatMensajes = document.getElementById("chatMensajes");
       const chatInput = document.getElementById("chatInput");
-
       const mensajesRef = collection(db, "chat");
       const q = query(mensajesRef, orderBy("timestamp"));
 
@@ -199,8 +203,11 @@
         snapshot.forEach((doc) => {
           const data = doc.data();
           const emoji = data.usuario === "Ele" ? "💙" : "💖";
+          const hora = data.timestamp ? formatarData(data.timestamp) : "🕒";
+          const lido = "✅";
+
           const mensajeElem = document.createElement("div");
-          mensajeElem.innerHTML = `<strong>${emoji} ${data.usuario}:</strong> ${data.mensaje}`;
+          mensajeElem.innerHTML = `<strong>${emoji} ${data.usuario}:</strong> ${data.mensaje} <span class="hora">${hora} ${lido}</span>`;
           chatMensajes.appendChild(mensajeElem);
         });
         chatMensajes.scrollTop = chatMensajes.scrollHeight;
@@ -212,7 +219,7 @@
           await addDoc(mensajesRef, {
             usuario: usuario,
             mensaje: texto,
-            timestamp: new Date()
+            timestamp: serverTimestamp()
           });
           chatInput.value = "";
         }
@@ -230,7 +237,7 @@
       } else if (senha === "170125") {
         usuario = "Ela";
       } else if (senha === "4444") {
-        window.location.href = "https://blaze.com"; // 🚨 Saída de emergência
+        window.location.href = "https://blaze.com";
         return;
       } else {
         erroMsg.style.display = "block";
