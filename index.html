@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Como não falar com minha menininha 20 dias? 😅</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a2d0b5d6d3.js" crossorigin="anonymous"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(to right, #ffe6e6, #ffe6f0);
+    }
+    body.fundoAtivo {
+      background: url('background.png') no-repeat center center fixed;
+      background-size: cover;
+    }
+    body.fundoAtivo::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: white;
+      opacity: 0.2;
+      z-index: -1;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.85);
+      margin: 5% auto;
+      padding: 30px;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(255, 192, 203, 0.8);
+      text-align: center;
+      color: #8B0000;
+      display: none;
+      animation: fadeIn 1.2s ease;
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 25px;
+      font-weight: 600;
+    }
+    .dia {
+      font-size: 18px;
+      margin-bottom: 18px;
+      text-align: left;
+    }
+    .fecha { font-weight: bold; color: #D6336C; }
+    .mensaje { margin-left: 10px; }
+    .chat {
+      text-align: left;
+      margin-top: 20px;
+      border-top: 1px solid #ccc;
+      padding-top: 20px;
+    }
+    .chat-mensajes {
+      height: 200px;
+      overflow-y: auto;
+      background: #fff;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+    }
+    .chat input {
+      width: 80%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .chat button {
+      padding: 10px;
+      background-color: #D6336C;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .login-box {
+      background-image: url('background_login.png');
+      background-size: cover;
+      background-position: center;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .login-overlay {
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 30px 20px;
+      border-radius: 15px;
+      text-align: center;
+      width: 90%;
+      max-width: 320px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+    .login-overlay i {
+      font-size: 36px;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+    .login-overlay h2 {
+      margin-bottom: 20px;
+      color: #fff;
+      font-size: 20px;
+    }
+    .login-overlay input[type="password"] {
+      padding: 10px;
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+    .login-overlay button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #D6336C;
+      color: white;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .login-overlay button:hover {
+      background-color: #c12259;
+    }
+    .error {
+      color: red;
+      font-size: 14px;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box" id="loginBox">
+    <div class="login-overlay">
+      <i class="fas fa-lock"></i>
+      <h2>Confirmemos quem é você</h2>
+      <input type="password" id="senha" placeholder="Senha" onkeypress="if(event.key === 'Enter') verificarSenha()">
+      <button onclick="verificarSenha()">Entrar</button>
+      <p class="error" id="erroMsg" style="display:none;">Senha incorreta!</p>
+    </div>
+  </div>
+
+  <div class="container" id="conteudo">
+    <h1>Mais um dia sem você</h1>
+    <div class="dia">
+      <span class="fecha">Día 1:</span>
+      <span class="mensaje">Começei fazer o site para suas ferias kkkkkkkkk.</span>
+    </div>
+    <div class="chat">
+      <div class="chat-mensajes" id="chatMensajes"></div>
+      <input type="text" id="chatInput" placeholder="Escreva uma mensagem...">
+      <button id="enviarBtn">Enviar</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCTSH4oEu56rEGYapk9BW6PcrXjZ5UZm08",
+      authDomain: "chatlive-2f934.firebaseapp.com",
+      databaseURL: "https://chatlive-2f934-default-rtdb.firebaseio.com",
+      projectId: "chatlive-2f934",
+      storageBucket: "chatlive-2f934.appspot.com",
+      messagingSenderId: "929554773163",
+      appId: "1:929554773163:web:499f1a8ce3c201621073ee"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let usuario = localStorage.getItem("usuario");
+
+    function iniciarChat() {
+      const chatMensajes = document.getElementById("chatMensajes");
+      const chatInput = document.getElementById("chatInput");
+
+      const mensajesRef = collection(db, "chat");
+      const q = query(mensajesRef, orderBy("timestamp"));
+
+      onSnapshot(q, (snapshot) => {
+        chatMensajes.innerHTML = "";
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          const emoji = data.usuario === "Ele" ? "💙" : "💖";
+          const mensajeElem = document.createElement("div");
+          mensajeElem.innerHTML = `<strong>${emoji} ${data.usuario}:</strong> ${data.mensaje}`;
+          chatMensajes.appendChild(mensajeElem);
+        });
+        chatMensajes.scrollTop = chatMensajes.scrollHeight;
+      });
+
+      document.getElementById("enviarBtn").onclick = async () => {
+        const texto = chatInput.value.trim();
+        if (texto !== "") {
+          await addDoc(mensajesRef, {
+            usuario: usuario,
+            mensaje: texto,
+            timestamp: new Date()
+          });
+          chatInput.value = "";
+        }
+      };
+    }
+
+    window.verificarSenha = function () {
+      const senha = document.getElementById("senha").value;
+      const loginBox = document.getElementById("loginBox");
+      const conteudo = document.getElementById("conteudo");
+      const erroMsg = document.getElementById("erroMsg");
+
+      if (senha === "14141516") {
+        usuario = "Ele";
+      } else if (senha === "170125") {
+        usuario = "Ela";
+      } else if (senha === "4444") {
+        window.location.href = "https://blaze.com"; // 🚨 Saída de emergência
+        return;
+      } else {
+        erroMsg.style.display = "block";
+        return;
+      }
+
+      localStorage.setItem("usuario", usuario);
+      loginBox.style.display = "none";
+      conteudo.style.display = "block";
+      document.body.classList.add("fundoAtivo");
+      iniciarChat();
+    };
+  </script>
+</body>
+</html>
