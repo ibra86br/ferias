@@ -206,7 +206,7 @@
           const hora = data.timestamp ? formatarData(data.timestamp) : "🕒";
 
           const mensajeElem = document.createElement("div");
-          mensajeElem.innerHTML = `<strong>${emoji} ${data.usuario}:</strong> ${data.mensaje} <span class="hora">${hora} ${lido}</span>`;
+          mensajeElem.innerHTML = `<strong>${emoji} ${data.usuario}:</strong> ${data.mensaje} <span class="hora">${hora}</span>`;
           chatMensajes.appendChild(mensajeElem);
         });
         chatMensajes.scrollTop = chatMensajes.scrollHeight;
