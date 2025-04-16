@@ -2,79 +2,19 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mais um dia sem você</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blaze</title>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet" />
   <script src="https://kit.fontawesome.com/a2d0b5d6d3.js" crossorigin="anonymous"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <style>
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      padding: 0;
       font-family: 'Quicksand', sans-serif;
       background: linear-gradient(to right, #ffe6e6, #ffe6f0);
-    }
-    body.fundoAtivo {
-      background: url('background.png') no-repeat center center fixed;
-      background-size: cover;
-    }
-    body.fundoAtivo::before {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: white;
-      opacity: 0.2;
-      z-index: -1;
-    }
-    .container {
-      background: rgba(255, 255, 255, 0.85);
-      margin: 5% auto;
-      padding: 30px;
-      width: 90%;
-      max-width: 600px;
-      border-radius: 20px;
-      box-shadow: 0 0 20px rgba(255, 192, 203, 0.8);
-      text-align: center;
-      color: #8B0000;
-      display: none;
-      animation: fadeIn 1.2s ease;
-    }
-    h1 {
-      font-size: 32px;
-      margin-bottom: 25px;
-      font-weight: 600;
-    }
-    .chat {
-      text-align: left;
-      margin-top: 20px;
-      border-top: 1px solid #ccc;
-      padding-top: 20px;
-    }
-    .chat-mensajes {
-      height: 250px;
-      overflow-y: auto;
-      background: #fff;
-      padding: 10px;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ddd;
-    }
-    .chat input[type="text"] {
-      width: 70%;
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    .chat button {
-      padding: 10px;
-      background-color: #D6336C;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
     }
     .login-box {
       background-image: url('background_login.png');
@@ -85,212 +25,249 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
     }
     .login-overlay {
       background-color: rgba(0, 0, 0, 0.6);
-      padding: 30px 20px;
+      padding: 30px;
       border-radius: 15px;
       text-align: center;
+      color: #fff;
       width: 90%;
       max-width: 320px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.3);
     }
-    .login-overlay i {
-      font-size: 36px;
-      margin-bottom: 10px;
-      color: #fff;
-    }
-    .login-overlay h2 {
-      margin-bottom: 20px;
-      color: #fff;
-      font-size: 20px;
-    }
-    .login-overlay input[type="password"] {
+    .login-overlay i { font-size: 36px; margin-bottom: 10px; }
+    .login-overlay h2 { margin-bottom: 20px; }
+    .login-overlay input { padding: 10px; width: 100%; border-radius: 8px; margin-bottom: 15px; font-size: 16px; }
+    .login-overlay button {
       padding: 10px;
       width: 100%;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      margin-bottom: 15px;
-      font-size: 16px;
-    }
-    .login-overlay button {
-      padding: 10px 20px;
       border: none;
       background-color: #D6336C;
       color: white;
       border-radius: 8px;
       font-size: 16px;
       cursor: pointer;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.9);
+      margin: 5% auto;
+      padding: 30px;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(255, 192, 203, 0.8);
+      display: none;
+    }
+    .chat-mensajes {
+      height: 300px;
+      overflow-y: auto;
+      background: #fff;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    #chatInput {
       width: 100%;
+      padding: 10px 90px 10px 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
-    .login-overlay button:hover {
-      background-color: #c12259;
+    #emojiBtn, #cameraBtn {
+      position: absolute;
+      background: transparent;
+      border: none;
+      color: #D6336C;
+      font-size: 18px;
+      cursor: pointer;
     }
-    .error {
-      color: red;
-      font-size: 14px;
+    #emojiBtn {
+      right: 60px;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    #cameraBtn {
+      right: 30px;
+    }
+    #cameraBtn i, #emojiBtn i {
+      font-size: 20px;
+    }
+    #enviarBtn {
+      margin-left: 10px;
+      padding: 10px;
+      background-color: #D6336C;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .progress-bar {
+      margin-top: 10px;
+      height: 14px;
+      background: #f3f3f3;
+      border-radius: 20px;
+      overflow: hidden;
+      display: none;
+    }
+    .progress {
+      height: 100%;
+      background: linear-gradient(to right, #ff4d88, #ff99cc);
+      width: 0;
+      transition: width 0.3s ease;
     }
     .hora {
       font-size: 12px;
       color: gray;
-      margin-left: 8px;
+      margin-top: 5px;
+      display: block;
     }
-    /* Estilo do botão da câmera */
-    .upload-container button {
-      background-color: #D6336C;
-      color: white;
-      border: none;
-      padding: 10px 14px;
+    .mensagem {
+      max-width: 70%;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 15px;
+      word-wrap: break-word;
+      position: relative;
+      display: inline-block;
+    }
+    .mensagem.ele {
+      background-color: #e0f7fa;
+      align-self: flex-start;
+      border-top-left-radius: 0;
+    }
+    .mensagem.ela {
+      background-color: #fce4ec;
+      align-self: flex-end;
+      border-top-right-radius: 0;
+      text-align: right;
+    }
+    .mensagem img {
+      max-width: 150px;
       border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.2s;
     }
-    .upload-container button:hover {
-      background-color: #bf2c5e;
-    }
-    .upload-container i {
-      font-size: 18px;
+    emoji-picker {
+      position: absolute;
+      bottom: 50px;
+      right: 90px;
+      z-index: 100;
+      display: none;
     }
   </style>
 </head>
 <body>
   <div class="login-box" id="loginBox">
     <div class="login-overlay">
-      <i class="fas fa-lock"></i>
+      <i class="fas fa-heart"></i>
       <h2>Confirmemos quem é você</h2>
-      <input type="password" id="senha" placeholder="Senha" onkeypress="if(event.key === 'Enter') verificarSenha()">
-      <button onclick="verificarSenha()">Entrar</button>
-      <p class="error" id="erroMsg" style="display:none;">Senha incorreta!</p>
+      <input type="password" id="senha" placeholder="Senha" onkeydown="if(event.key==='Enter') entrarNoChat()" />
+      <button onclick="entrarNoChat()">Entrar</button>
     </div>
   </div>
-
-  <div class="container" id="conteudo">
-    <h1>Mais um dia sem você</h1>
+  <div class="container" id="chatContainer">
+    <h2 style="text-align:center;color:#D6336C">Mais um dia sem você</h2>
+    <div class="chat-mensajes" id="chatMensajes"></div>
+    <div class="progress-bar" id="progressBar"><div class="progress" id="progress"></div></div>
     <div class="chat">
-      <div class="chat-mensajes" id="chatMensajes"></div>
-      <input type="text" id="chatInput" placeholder="Escreva uma mensagem...">
-      <button id="enviarBtn">Enviar</button>
-      <div class="upload-container">
-        <input type="file" id="imagemInput" accept="image/*" capture="environment" style="display: none;">
-        <button id="cameraBtn" title="Enviar foto da câmera">
-          <i class="fas fa-camera"></i>
-        </button>
-        <span id="loadingIcon" style="display: none;" class="loading"></span>
+      <div class="chat-input-wrapper">
+        <input type="text" id="chatInput" placeholder="Escreva uma mensagem..." onkeydown="if(event.key==='Enter') enviarMensagem()">
+        <button id="emojiBtn"><i class="far fa-smile"></i></button>
+        <button id="cameraBtn"><i class="fas fa-camera"></i></button>
+        <button id="enviarBtn" onclick="enviarMensagem()">Enviar</button>
+        <emoji-picker id="emojiPicker"></emoji-picker>
       </div>
     </div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-storage.js";
-
+  <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyCTSH4oEu56rEGYapk9BW6PcrXjZ5UZm08",
-      authDomain: "chatlive-2f934.firebaseapp.com",
-      databaseURL: "https://chatlive-2f934-default-rtdb.firebaseio.com",
-      projectId: "chatlive-2f934",
-      storageBucket: "chatlive-2f934.appspot.com",
-      messagingSenderId: "929554773163",
-      appId: "1:929554773163:web:499f1a8ce3c201621073ee"
+      apiKey: "SUA_API_KEY",
+      authDomain: "SEU_DOMINIO.firebaseapp.com",
+      databaseURL: "https://SEU_DOMINIO.firebaseio.com",
+      projectId: "SEU_PROJECT_ID",
+      storageBucket: "SEU_BUCKET.appspot.com",
+      messagingSenderId: "SEU_MESSAGING_ID",
+      appId: "SEU_APP_ID"
     };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
-    let usuario = localStorage.getItem("usuario");
+    const loginBox = document.getElementById('loginBox');
+    const chatContainer = document.getElementById('chatContainer');
+    const senhaInput = document.getElementById('senha');
+    const chatMensajes = document.getElementById('chatMensajes');
+    const chatInput = document.getElementById('chatInput');
+    const emojiBtn = document.getElementById('emojiBtn');
+    const emojiPicker = document.getElementById('emojiPicker');
 
-    function formatarData(data) {
-      const d = data.toDate();
-      return d.toLocaleDateString() + ' ' + d.toLocaleTimeString().slice(0, 5);
+    let usuario = "";
+
+    function entrarNoChat() {
+      const senha = senhaInput.value.trim();
+      if (senha === "14141516") usuario = "Ele";
+      else if (senha === "170125") usuario = "Ela";
+      else if (senha === "4444") return window.location.href = "https://blaze.com";
+      else return alert("Senha incorreta");
+
+      loginBox.style.display = "none";
+      chatContainer.style.display = "block";
+      carregarMensagens();
     }
 
-    function iniciarChat() {
-      const chatMensajes = document.getElementById("chatMensajes");
-      const chatInput = document.getElementById("chatInput");
-      const mensagensRef = collection(db, "chat");
-      const q = query(mensagensRef, orderBy("timestamp"));
-
-      onSnapshot(q, (snapshot) => {
+    function carregarMensagens() {
+      db.ref("mensagens").on("value", snapshot => {
+        const mensagens = snapshot.val() || {};
+        const lista = Object.values(mensagens).sort((a,b) => a.timestamp - b.timestamp);
         chatMensajes.innerHTML = "";
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          const emoji = data.usuario === "Ele" ? "💙" : "💖";
-          const hora = data.timestamp ? formatarData(data.timestamp) : "🕒";
+        lista.forEach(data => {
+          const hora = new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+          const dataFormatada = new Date(data.timestamp).toLocaleDateString();
 
-          const mensajeElem = document.createElement("div");
+          const msg = document.createElement("div");
+          msg.className = `mensagem ${data.usuario === "Ele" ? 'ele' : 'ela'}`;
+
           if (data.imagemUrl) {
-            mensajeElem.innerHTML = `<strong>${emoji} ${data.usuario}:</strong> <img src="${data.imagemUrl}" style="width: 100px; border-radius: 10px;"> <span class="hora">${hora}</span>`;
+            msg.innerHTML = `<img src="${data.imagemUrl}"><div class="hora">${dataFormatada} ${hora}</div>`;
           } else {
-            mensajeElem.innerHTML = `<strong>${emoji} ${data.usuario}:</strong> ${data.mensaje} <span class="hora">${hora}</span>`;
+            msg.innerHTML = `${data.mensagem}<div class="hora">${dataFormatada} ${hora}</div>`;
           }
-          chatMensajes.appendChild(mensajeElem);
+          chatMensajes.appendChild(msg);
         });
         chatMensajes.scrollTop = chatMensajes.scrollHeight;
       });
-
-      document.getElementById("enviarBtn").onclick = async () => {
-        const texto = chatInput.value.trim();
-        if (texto !== "") {
-          await addDoc(mensagensRef, {
-            usuario: usuario,
-            mensaje: texto,
-            timestamp: serverTimestamp()
-          });
-          chatInput.value = "";
-        }
-      };
-
-      document.getElementById("cameraBtn").onclick = () => {
-        document.getElementById("imagemInput").click();
-      };
-
-      document.getElementById("imagemInput").onchange = async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const storageRef = ref(storage, 'imagens/' + file.name);
-          const uploadTask = await uploadBytes(storageRef, file);
-          const imageUrl = await getDownloadURL(uploadTask.ref);
-          
-          await addDoc(mensagensRef, {
-            usuario: usuario,
-            imagenUrl: imageUrl,
-            timestamp: serverTimestamp()
-          });
-        }
-      };
     }
 
-    window.verificarSenha = function () {
-      const senha = document.getElementById("senha").value;
-      const loginBox = document.getElementById("loginBox");
-      const conteudo = document.getElementById("conteudo");
-      const erroMsg = document.getElementById("erroMsg");
+    function enviarMensagem() {
+      const texto = chatInput.value.trim();
+      if (texto === "") return;
+      const novaMensagem = {
+        usuario: usuario,
+        mensagem: texto,
+        timestamp: Date.now()
+      };
+      db.ref("mensagens").push(novaMensagem);
+      chatInput.value = "";
+    }
 
-      if (senha === "14141516") {
-        usuario = "Ele";
-      } else if (senha === "170125") {
-        usuario = "Ela";
-      } else if (senha === "4444") {
-        window.location.href = "https://blaze.com";
-        return;
-      } else {
-        erroMsg.style.display = "block";
-        return;
-      }
-
-      localStorage.setItem("usuario", usuario);
-      loginBox.style.display = "none";
-      conteudo.style.display = "block";
-      document.body.classList.add("fundoAtivo");
-      iniciarChat();
+    emojiBtn.onclick = () => {
+      emojiPicker.style.display = emojiPicker.style.display === 'block' ? 'none' : 'block';
     };
+
+    emojiPicker.addEventListener('emoji-click', event => {
+      chatInput.value += event.detail.unicode;
+      chatInput.focus();
+      emojiPicker.style.display = 'none';
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!emojiPicker.contains(e.target) && e.target !== emojiBtn && !emojiBtn.contains(e.target)) {
+        emojiPicker.style.display = 'none';
+      }
+    });
   </script>
 </body>
 </html>
