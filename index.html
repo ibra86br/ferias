@@ -82,7 +82,7 @@
     #fotoBtn {
       background: #ffe6f0;
       border: 2px solid #D6336C;
-      border-radius: 50%;
+      border-radius: 8px;
       width: 40px;
       height: 40px;
       color: #D6336C;
@@ -153,6 +153,59 @@
     .mensagem img {
       max-width: 150px;
       border-radius: 10px;
+      cursor: pointer;
+    }
+
+    /* Popup imagem */
+    #popupImagem {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    #popupConteudo {
+      position: relative;
+      animation: scaleUp 0.3s ease;
+    }
+
+    #popupConteudo img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 10px;
+    }
+
+    #fecharBtn {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      font-size: 30px;
+      color: white;
+      background: #D6336C;
+      border-radius: 50%;
+      padding: 4px 10px;
+      cursor: pointer;
+      z-index: 1001;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      transition: background 0.3s ease;
+    }
+    #fecharBtn:hover {
+      background: #ff4d88;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes scaleUp {
+      from { transform: scale(0.9); }
+      to { transform: scale(1); }
     }
   </style>
 </head>
@@ -165,6 +218,7 @@
       <button onclick="entrarNoChat()">Entrar</button>
     </div>
   </div>
+
   <div class="container" id="chatContainer">
     <h2 style="text-align:center;color:#D6336C">Mais um dia sem você</h2>
     <div class="chat-mensajes" id="chatMensajes"></div>
@@ -176,6 +230,14 @@
         <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="uploadFoto(this)">
         <button id="enviarBtn" onclick="enviarMensagem()">Enviar</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Popup de imagem -->
+  <div id="popupImagem" onclick="fecharPopup()">
+    <div id="popupConteudo" onclick="event.stopPropagation()">
+      <span id="fecharBtn" onclick="fecharPopup()">&times;</span>
+      <img id="popupImg" />
     </div>
   </div>
 
@@ -198,8 +260,6 @@
     const chatInput = document.getElementById('chatInput');
     const progressBar = document.getElementById('progressBar');
     const progress = document.getElementById('progress');
-
-    let usuario = "";
 
     function entrarNoChat() {
       const senha = senhaInput.value.trim();
@@ -226,7 +286,7 @@
           msg.className = `mensagem ${data.usuario === "Ele" ? 'ele' : 'ela'}`;
 
           if (data.imagemUrl) {
-            msg.innerHTML = `<img src="${data.imagemUrl}"><div class="hora">${dataFormatada} ${hora}</div>`;
+            msg.innerHTML = `<img src="${data.imagemUrl}" onclick="abrirPopup('${data.imagemUrl}')"><div class="hora">${dataFormatada} ${hora}</div>`;
           } else {
             msg.innerHTML = `${data.mensagem}<div class="hora">${dataFormatada} ${hora}</div>`;
           }
@@ -291,6 +351,17 @@
 
       xhr.send(formData);
     }
+
+    function abrirPopup(url) {
+      document.getElementById('popupImg').src = url;
+      document.getElementById('popupImagem').style.display = 'flex';
+    }
+
+    function fecharPopup() {
+      document.getElementById('popupImagem').style.display = 'none';
+    }
+
+    let usuario = "";
   </script>
 </body>
 </html>
