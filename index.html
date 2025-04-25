@@ -83,14 +83,18 @@
       background: transparent;
       border: none;
       color: #D6336C;
-      font-size: 20px;
+      font-size: 24px;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     #fotoBtn i {
       font-size: 24px;
+      color: #D6336C;
     }
     #enviarBtn {
-      padding: 10px 16px;
+      padding: 10px;
       background-color: #D6336C;
       color: white;
       border: none;
@@ -153,7 +157,7 @@
   <div class="login-box" id="loginBox">
     <div class="login-overlay">
       <i class="fas fa-heart"></i>
-      <h2>Entrar no Chat</h2>
+      <h2>Autenticação</h2>
       <input type="password" id="senha" placeholder="Senha" onkeydown="if(event.key==='Enter') entrarNoChat()" />
       <button onclick="entrarNoChat()">Entrar</button>
     </div>
@@ -165,8 +169,8 @@
     <div class="chat">
       <div class="chat-input-wrapper">
         <input type="text" id="chatInput" placeholder="Escreva uma mensagem..." onkeydown="if(event.key==='Enter') enviarMensagem()">
-        <button id="fotoBtn" onclick="document.getElementById('fotoInput').click()"><i class="fas fa-image"></i></button>
-        <input type="file" id="fotoInput" accept="image/*" style="display:none" onchange="enviarFoto()" />
+        <button id="fotoBtn" onclick="document.getElementById('fileInput').click()"><i class="fas fa-camera"></i></button>
+        <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="enviarFoto()">
         <button id="enviarBtn" onclick="enviarMensagem()">Enviar</button>
       </div>
     </div>
@@ -189,6 +193,7 @@
     const senhaInput = document.getElementById('senha');
     const chatMensajes = document.getElementById('chatMensajes');
     const chatInput = document.getElementById('chatInput');
+    const fileInput = document.getElementById('fileInput');
     const progressBar = document.getElementById('progressBar');
     const progress = document.getElementById('progress');
 
@@ -242,46 +247,33 @@
     }
 
     function enviarFoto() {
-      const arquivo = document.getElementById('fotoInput').files[0];
+      const arquivo = fileInput.files[0];
       if (!arquivo) return;
-
-      progressBar.style.display = 'block';
-      progress.style.width = '0%';
 
       const formData = new FormData();
       formData.append("image", arquivo);
+
+      progressBar.style.display = "block";
+      progress.style.width = "0%";
 
       const xhr = new XMLHttpRequest();
       xhr.open("POST", "https://api.imgur.com/3/image");
       xhr.setRequestHeader("Authorization", "Client-ID 9c2d72d1a0c3b0b");
 
-      xhr.upload.onprogress = function (e) {
-        if (e.lengthComputable) {
-          const percent = (e.loaded / e.total) * 100;
-          progress.style.width = percent + '%';
-        }
+      xhr.upload.onprogress = (e) => {
+        const percent = (e.loaded / e.total) * 100;
+        progress.style.width = percent + "%";
       };
 
-      xhr.onload = function () {
-        progressBar.style.display = 'none';
-        if (xhr.status === 200) {
-          const response = JSON.parse(xhr.responseText);
-          const link = response.data.link;
-
-          const novaMensagem = {
-            usuario: usuario,
-            imagemUrl: link,
-            timestamp: Date.now()
-          };
-          db.ref("mensagens").push(novaMensagem);
-        } else {
-          alert("Erro ao enviar imagem.");
-        }
-      };
-
-      xhr.onerror = function () {
-        progressBar.style.display = 'none';
-        alert("Erro de conexão ao enviar imagem.");
+      xhr.onload = () => {
+        progressBar.style.display = "none";
+        const response = JSON.parse(xhr.responseText);
+        const imagemUrl = response.data.link;
+        db.ref("mensagens").push({
+          usuario: usuario,
+          imagemUrl: imagemUrl,
+          timestamp: Date.now()
+        });
       };
 
       xhr.send(formData);
